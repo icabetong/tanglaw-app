@@ -1,73 +1,91 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:tanglaw/core/drugs_api.dart';
-import 'package:tanglaw/core/network/api_client.dart';
-import 'package:tanglaw/shared/models/drug.dart';
-import 'package:tanglaw/shared/models/paginated.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tanglaw/features/main/provider_drugs.dart';
+import 'package:tanglaw/features/main/provider_search.dart';
 
-class MainPage extends StatefulWidget {
+class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  ConsumerState<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
-  late Future<Paginated<Drug>> drugs;
+class _MainPageState extends ConsumerState<MainPage> {
+  final SearchController _controller = SearchController();
+
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
-    final client = ApiClient();
-    final api = DrugsApi(client);
-    drugs = api.fetchDrugs();
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    final query = ref.watch(searchQueryProvider);
+    final drugs = ref.watch(drugProvider(query));
+
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: FutureBuilder<Paginated<Drug>>(
-        future: drugs,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return ListView.builder(
-              itemCount: snapshot.data!.data.length,
-              itemBuilder: (context, index) {
-                final element = snapshot.data!.data[index];
-                return ListTile(title: Text(element.name));
-              },
-            );
-          } else if (snapshot.hasError) {
-            return Text('error');
-          }
+        toolbarHeight: 72,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: SearchBar(
+          controller: _controller,
+          elevation: WidgetStateProperty.all(0),
+          backgroundColor: WidgetStateProperty.all(
+            Theme.of(context).colorScheme.surfaceContainerHigh,
+          ),
+          constraints: const BoxConstraints(maxHeight: 48, minHeight: 48),
+          hintText: 'Search',
+          leading: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: const Icon(Icons.search),
+          ),
+          trailing: [
+            if (_controller.text.isNotEmpty)
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  _controller.clear();
+                },
+              ),
 
-          return const CircularProgressIndicator();
-        },
+            IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
+          ],
+          onChanged: (value) {
+            if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+            _debounce = Timer(const Duration(milliseconds: 500), () {
+              ref.read(searchQueryProvider.notifier).updateQuery(value);
+            });
+          },
+        ),
+      ),
+      body: RefreshIndicator(
+        onRefresh: () => ref.refresh(drugProvider(query).future),
+        child: drugs.when(
+          data: (list) => ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: list.data.length,
+            itemBuilder: (context, index) => ListTile(
+              title: Text(list.data[index].name),
+              subtitle: Text(list.data[index].genericName),
+            ),
+          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text("$err: $stack")),
+        ),
       ),
     );
   }

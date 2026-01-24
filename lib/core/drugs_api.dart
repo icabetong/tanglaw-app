@@ -8,7 +8,12 @@ class DrugsApi {
   final ApiClient client;
 
   Future<Paginated<Drug>> fetchDrugs({String? query}) async {
-    final items = await client.get('/drugs');
+    String endpoint = '/drugs';
+    if (query != null && query.isNotEmpty) {
+      endpoint = '/drugs?filters[name][\$contains]=$query';
+    }
+    final items = await client.get(endpoint);
+
     return Paginated.fromJson(items, Drug.fromJson);
   }
 }
