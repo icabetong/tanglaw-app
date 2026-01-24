@@ -58,8 +58,6 @@ class _MainScreen extends ConsumerState<MainScreen> {
     final locale = localeAsync.value ?? 'en';
     final drugs = ref.watch(drugProvider((query: query, locale: locale)));
 
-    debugPrint(locale);
-
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 72,
