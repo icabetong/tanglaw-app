@@ -2,19 +2,23 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tanglaw/features/detail/page.dart';
 import 'package:tanglaw/features/main/provider_drugs.dart';
 import 'package:tanglaw/features/main/provider_search.dart';
+import 'package:tanglaw/features/settings/page.dart';
+import 'package:tanglaw/features/settings/provider_locale.dart';
+import 'package:tanglaw/l10n/app_localizations.dart';
 
-class MainPage extends ConsumerStatefulWidget {
-  const MainPage({super.key, required this.title});
+class MainScreen extends ConsumerStatefulWidget {
+  const MainScreen({super.key, required this.title});
 
   final String title;
 
   @override
-  ConsumerState<MainPage> createState() => _MainPageState();
+  ConsumerState<MainScreen> createState() => _MainScreen();
 }
 
-class _MainPageState extends ConsumerState<MainPage> {
+class _MainScreen extends ConsumerState<MainScreen> {
   final SearchController _controller = SearchController();
 
   Timer? _debounce;
@@ -31,10 +35,30 @@ class _MainPageState extends ConsumerState<MainPage> {
     super.dispose();
   }
 
+  void onMenuItemSelected(String option) {
+    switch (option) {
+      case 'settings':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SettingsScreen()),
+        );
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final Map<String, String> menuItems = {
+      'settings': AppLocalizations.of(context)!.menu_settings,
+      'about': AppLocalizations.of(context)!.menu_about,
+    };
+
     final query = ref.watch(searchQueryProvider);
-    final drugs = ref.watch(drugProvider(query));
+    final localeAsync = ref.watch(localeProvider);
+    final locale = localeAsync.value ?? 'en';
+    final drugs = ref.watch(drugProvider((query: query, locale: locale)));
+
+    debugPrint(locale);
 
     return Scaffold(
       appBar: AppBar(
@@ -47,7 +71,7 @@ class _MainPageState extends ConsumerState<MainPage> {
             Theme.of(context).colorScheme.surfaceContainerHigh,
           ),
           constraints: const BoxConstraints(maxHeight: 48, minHeight: 48),
-          hintText: 'Search',
+          hintText: AppLocalizations.of(context)!.placeholder_search,
           leading: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: const Icon(Icons.search),
@@ -61,7 +85,18 @@ class _MainPageState extends ConsumerState<MainPage> {
                 },
               ),
 
-            IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
+            // IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
+            PopupMenuButton<String>(
+              itemBuilder: (context) {
+                return menuItems.entries.map((entry) {
+                  return PopupMenuItem(
+                    value: entry.key,
+                    child: Text(entry.value),
+                  );
+                }).toList();
+              },
+              onSelected: onMenuItemSelected,
+            ),
           ],
           onChanged: (value) {
             if (_debounce?.isActive ?? false) _debounce!.cancel();
@@ -73,7 +108,8 @@ class _MainPageState extends ConsumerState<MainPage> {
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: () => ref.refresh(drugProvider(query).future),
+        onRefresh: () =>
+            ref.refresh(drugProvider((query: query, locale: locale)).future),
         child: drugs.when(
           data: (list) => ListView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -81,6 +117,12 @@ class _MainPageState extends ConsumerState<MainPage> {
             itemBuilder: (context, index) => ListTile(
               title: Text(list.data[index].name),
               subtitle: Text(list.data[index].genericName),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetailScreen(drug: list.data[index]),
+                ),
+              ),
             ),
           ),
           loading: () => const Center(child: CircularProgressIndicator()),

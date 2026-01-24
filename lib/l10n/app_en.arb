@@ -1,0 +1,11 @@
+{
+  "app_name": "Tanglaw",
+  "route_settings": "Settings",
+  "placeholder_search": "Search",
+  "loading_languages": "Loading languages...",
+  "menu_settings": "Settings",
+  "menu_about": "About",
+  "pref_language": "Language",
+  "pref_language_option_en": "English",
+  "pref_language_option_fil": "Filipino"
+}
