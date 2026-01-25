@@ -21,34 +21,19 @@ class MainScreen extends ConsumerStatefulWidget {
 
 class _MainScreen extends ConsumerState<MainScreen> {
   final SearchController _controller = SearchController();
-  final ScrollController _scrollController = ScrollController();
 
   Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     _debounce?.cancel();
     _controller.dispose();
-    _scrollController.dispose();
     super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
-      // Load more when 200px from bottom
-      final query = ref.read(searchQueryProvider);
-      final locale = ref.read(localeProvider).value ?? 'en';
-      ref
-          .read(paginatedDrugsProvider((query: query, locale: locale)))
-          .loadMore();
-    }
   }
 
   void onMenuItemSelected(String option) {
@@ -78,9 +63,7 @@ class _MainScreen extends ConsumerState<MainScreen> {
     final query = ref.watch(searchQueryProvider);
     final localeAsync = ref.watch(localeProvider);
     final locale = localeAsync.value ?? 'en';
-    final notifier = ref.watch(
-      paginatedDrugsProvider((query: query, locale: locale)),
-    );
+    final drugs = ref.watch(drugProvider((query: query, locale: locale)));
 
     return Scaffold(
       appBar: AppBar(
@@ -130,58 +113,26 @@ class _MainScreen extends ConsumerState<MainScreen> {
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: () async {
-          final query = ref.read(searchQueryProvider);
-          final locale = ref.read(localeProvider).value ?? 'en';
-          await ref
-              .read(paginatedDrugsProvider((query: query, locale: locale)))
-              .refresh();
-        },
-        child: notifier.error != null
-            ? ListView(
-                children: [
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.7,
-                    child: Center(child: Text(notifier.error!)),
-                  ),
-                ],
-              )
-            : notifier.drugs.isEmpty && notifier.isInitialLoading
-            ? ListView(
-                children: [
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.7,
-                    child: const Center(child: CircularProgressIndicator()),
-                  ),
-                ],
-              )
-            : ListView.builder(
-                controller: _scrollController,
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: notifier.drugs.length + (notifier.hasMore ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index >= notifier.drugs.length) {
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
-
-                  final drug = notifier.drugs[index];
-                  return ListTile(
-                    title: Text(drug.name),
-                    subtitle: Text(drug.genericName),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailScreen(drug: drug),
-                      ),
-                    ),
-                  );
-                },
+        onRefresh: () =>
+            ref.refresh(drugProvider((query: query, locale: locale)).future),
+        child: drugs.when(
+          data: (list) => ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: list.data.length,
+            itemBuilder: (context, index) => ListTile(
+              title: Text(list.data[index].name),
+              subtitle: Text(list.data[index].genericName),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetailScreen(drug: list.data[index]),
+                ),
               ),
+            ),
+          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text("$err: $stack")),
+        ),
       ),
     );
   }

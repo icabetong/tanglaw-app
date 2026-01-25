@@ -25,8 +25,6 @@ class DrugsRepository {
   Future<StrapiResponse<List<Drug>>> fetchList({
     String? query,
     String? locale,
-    int page = 1,
-    int pageSize = 20,
   }) async {
     final uri = Uri(
       path: '/drugs',
@@ -34,8 +32,6 @@ class DrugsRepository {
         if (query != null && query.isNotEmpty)
           'filters[name][\$contains]': query,
         if (locale != null && locale.isNotEmpty) 'locale': locale,
-        'pagination[page]': page.toString(),
-        'pagination[pageSize]': pageSize.toString(),
       },
     );
     final endpoint = uri.toString();
