@@ -106,6 +106,12 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get route_settings;
 
+  /// No description provided for @route_about.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get route_about;
+
   /// No description provided for @placeholder_search.
   ///
   /// In en, this message translates to:

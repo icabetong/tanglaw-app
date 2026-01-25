@@ -15,6 +15,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get route_settings => 'Settings';
 
   @override
+  String get route_about => 'About';
+
+  @override
   String get placeholder_search => 'Search';
 
   @override

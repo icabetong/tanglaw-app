@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tanglaw/features/about/page.dart';
 import 'package:tanglaw/features/detail/page.dart';
 import 'package:tanglaw/features/main/provider_drugs.dart';
 import 'package:tanglaw/features/main/provider_search.dart';
@@ -41,6 +42,12 @@ class _MainScreen extends ConsumerState<MainScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const SettingsScreen()),
+        );
+        break;
+      case 'about':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AboutScreen()),
         );
         break;
     }

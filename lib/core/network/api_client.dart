@@ -7,8 +7,10 @@ class ApiClient {
   static ApiClient? _client;
   final String _endpoint = 'http://10.0.2.2:1337/api';
 
+  ApiClient._();
+
   static ApiClient getInstance() {
-    _client ??= ApiClient();
+    _client ??= ApiClient._();
     return _client!;
   }
 
