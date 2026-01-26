@@ -27,6 +27,11 @@ class _MainScreen extends ConsumerState<MainScreen> {
   @override
   void initState() {
     super.initState();
+    // Initialize the notifier on first load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final locale = ref.read(localeProvider).value ?? 'en';
+      ref.read(drugListProvider.notifier).initialize('', locale);
+    });
   }
 
   @override
@@ -63,7 +68,7 @@ class _MainScreen extends ConsumerState<MainScreen> {
     final query = ref.watch(searchQueryProvider);
     final localeAsync = ref.watch(localeProvider);
     final locale = localeAsync.value ?? 'en';
-    final drugs = ref.watch(drugProvider((query: query, locale: locale)));
+    final drugState = ref.watch(drugListProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -90,7 +95,6 @@ class _MainScreen extends ConsumerState<MainScreen> {
                 },
               ),
 
-            // IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
             PopupMenuButton<String>(
               itemBuilder: (context) {
                 return menuItems.entries.map((entry) {
@@ -108,31 +112,61 @@ class _MainScreen extends ConsumerState<MainScreen> {
 
             _debounce = Timer(const Duration(milliseconds: 500), () {
               ref.read(searchQueryProvider.notifier).updateQuery(value);
+              ref.read(drugListProvider.notifier).initialize(value, locale);
             });
           },
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: () =>
-            ref.refresh(drugProvider((query: query, locale: locale)).future),
-        child: drugs.when(
-          data: (list) => ListView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: list.data.length,
-            itemBuilder: (context, index) => ListTile(
-              title: Text(list.data[index].name),
-              subtitle: Text(list.data[index].genericName),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DetailScreen(drug: list.data[index]),
-                ),
+        onRefresh: () async {
+          ref.read(drugListProvider.notifier).initialize(query, locale);
+        },
+        child: drugState.error != null
+            ? Center(child: Text(drugState.error!))
+            : ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: drugState.drugs.length + 1,
+                itemBuilder: (context, index) {
+                  // show drug items
+                  if (index < drugState.drugs.length) {
+                    final drug = drugState.drugs[index];
+                    return ListTile(
+                      title: Text(drug.name),
+                      subtitle: Text(drug.genericName),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailScreen(drug: drug),
+                        ),
+                      ),
+                    );
+                  }
+
+                  if (drugState.loading) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+
+                  if (drugState.hasMore) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: ElevatedButton(
+                          onPressed: () =>
+                              ref.read(drugListProvider.notifier).loadMore(),
+                          child: Text('Load More'),
+                        ),
+                      ),
+                    );
+                  }
+
+                  return const SizedBox.shrink();
+                },
               ),
-            ),
-          ),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, stack) => Center(child: Text("$err: $stack")),
-        ),
       ),
     );
   }
