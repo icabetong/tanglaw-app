@@ -2,6 +2,7 @@
   "app_name": "Tanglaw",
   "route_settings": "Settings",
   "route_about": "About",
+  "button_load_more": "Load more",
   "placeholder_search": "Search",
   "loading_languages": "Loading languages...",
   "menu_settings": "Settings",

@@ -112,6 +112,12 @@ abstract class AppLocalizations {
   /// **'About'**
   String get route_about;
 
+  /// No description provided for @button_load_more.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get button_load_more;
+
   /// No description provided for @placeholder_search.
   ///
   /// In en, this message translates to:

@@ -158,7 +158,9 @@ class _MainScreen extends ConsumerState<MainScreen> {
                         child: ElevatedButton(
                           onPressed: () =>
                               ref.read(drugListProvider.notifier).loadMore(),
-                          child: Text('Load More'),
+                          child: Text(
+                            AppLocalizations.of(context)!.button_load_more,
+                          ),
                         ),
                       ),
                     );
