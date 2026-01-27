@@ -9,5 +9,7 @@
   "menu_about": "About",
   "pref_language": "Language",
   "pref_language_option_en": "English",
-  "pref_language_option_fil": "Filipino"
+  "pref_language_option_fil": "Filipino",
+  "status_no_internet": "No Connection",
+  "status_has_internet": "Connection Established"
 }

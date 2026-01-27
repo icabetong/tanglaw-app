@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:tanglaw/core/providers/connectivity.dart';
 import 'package:tanglaw/features/about/page.dart';
 import 'package:tanglaw/features/detail/page.dart';
 import 'package:tanglaw/features/main/provider_drugs.dart';
@@ -69,6 +71,35 @@ class _MainScreen extends ConsumerState<MainScreen> {
     final localeAsync = ref.watch(localeProvider);
     final locale = localeAsync.value ?? 'en';
     final drugState = ref.watch(drugListProvider);
+
+    ref.listen<AsyncValue<InternetStatus>>(internetStatusProvider, (
+      previous,
+      next,
+    ) {
+      next.whenData((status) {
+        debugPrint(status.toString());
+        if (status == InternetStatus.disconnected) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.status_no_internet),
+              backgroundColor: Colors.red,
+              duration: Duration(days: 1),
+              showCloseIcon: false,
+            ),
+          );
+        } else if (status == InternetStatus.connected &&
+            previous?.value == InternetStatus.disconnected) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.status_has_internet),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      });
+    });
 
     return Scaffold(
       appBar: AppBar(

@@ -40,4 +40,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pref_language_option_fil => 'Filipino';
+
+  @override
+  String get status_no_internet => 'No Connection';
+
+  @override
+  String get status_has_internet => 'Connection Established';
 }

@@ -159,6 +159,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Filipino'**
   String get pref_language_option_fil;
+
+  /// No description provided for @status_no_internet.
+  ///
+  /// In en, this message translates to:
+  /// **'No Connection'**
+  String get status_no_internet;
+
+  /// No description provided for @status_has_internet.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection Established'**
+  String get status_has_internet;
 }
 
 class _AppLocalizationsDelegate
