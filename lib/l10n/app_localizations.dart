@@ -118,6 +118,12 @@ abstract class AppLocalizations {
   /// **'Load more'**
   String get button_load_more;
 
+  /// No description provided for @button_refresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get button_refresh;
+
   /// No description provided for @placeholder_search.
   ///
   /// In en, this message translates to:
@@ -160,6 +166,42 @@ abstract class AppLocalizations {
   /// **'Filipino'**
   String get pref_language_option_fil;
 
+  /// No description provided for @pref_setup_offline_use.
+  ///
+  /// In en, this message translates to:
+  /// **'Setup for Offline Use'**
+  String get pref_setup_offline_use;
+
+  /// No description provided for @pref_setup_offline_use_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Save drug data for offline use, even in low-signal areas'**
+  String get pref_setup_offline_use_desc;
+
+  /// No description provided for @pref_setup_offline_use_loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading Medical Database...'**
+  String get pref_setup_offline_use_loading;
+
+  /// No description provided for @pref_setup_offline_use_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed, try again later'**
+  String get pref_setup_offline_use_error;
+
+  /// No description provided for @pref_sync_with_server.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Medical Database'**
+  String get pref_sync_with_server;
+
+  /// No description provided for @pref_sync_with_server_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh your local library with the latest pharmaceutical data, dosage updates, and safety advisories from the server.'**
+  String get pref_sync_with_server_desc;
+
   /// No description provided for @status_no_internet.
   ///
   /// In en, this message translates to:
@@ -171,6 +213,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Connection Established'**
   String get status_has_internet;
+
+  /// No description provided for @error_generic.
+  ///
+  /// In en, this message translates to:
+  /// **'An Error Occurred'**
+  String get error_generic;
 }
 
 class _AppLocalizationsDelegate

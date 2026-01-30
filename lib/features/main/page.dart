@@ -7,10 +7,12 @@ import 'package:tanglaw/core/providers/connectivity.dart';
 import 'package:tanglaw/features/about/page.dart';
 import 'package:tanglaw/features/detail/page.dart';
 import 'package:tanglaw/features/main/provider_drugs.dart';
+import 'package:tanglaw/features/main/provider_store.dart';
 import 'package:tanglaw/features/main/provider_search.dart';
 import 'package:tanglaw/features/settings/page.dart';
 import 'package:tanglaw/features/settings/provider_locale.dart';
 import 'package:tanglaw/l10n/app_localizations.dart';
+import 'package:tanglaw/shared/widgets/paginated_list.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key, required this.title});
@@ -67,18 +69,21 @@ class _MainScreen extends ConsumerState<MainScreen> {
       'about': AppLocalizations.of(context)!.menu_about,
     };
 
+    final connectionState = ref.watch(internetStatusProvider);
+    final drugState = ref.watch(drugListProvider);
     final query = ref.watch(searchQueryProvider);
     final localeAsync = ref.watch(localeProvider);
     final locale = localeAsync.value ?? 'en';
-    final drugState = ref.watch(drugListProvider);
+    final storeAsync = ref.watch(storeProvider((query: query, locale: locale)));
 
     ref.listen<AsyncValue<InternetStatus>>(internetStatusProvider, (
       previous,
       next,
     ) {
       next.whenData((status) {
-        debugPrint(status.toString());
         if (status == InternetStatus.disconnected) {
+          ref.invalidate(storeProvider((query: query, locale: locale)));
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(AppLocalizations.of(context)!.status_no_internet),
@@ -89,6 +94,7 @@ class _MainScreen extends ConsumerState<MainScreen> {
           );
         } else if (status == InternetStatus.connected &&
             previous?.value == InternetStatus.disconnected) {
+          ref.read(drugListProvider.notifier).initialize(query, locale);
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -123,6 +129,22 @@ class _MainScreen extends ConsumerState<MainScreen> {
                 icon: const Icon(Icons.close),
                 onPressed: () {
                   _controller.clear();
+
+                  if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+                  _debounce = Timer(const Duration(milliseconds: 500), () {
+                    ref.read(searchQueryProvider.notifier).updateQuery('');
+
+                    if (connectionState.value == InternetStatus.connected) {
+                      ref
+                          .read(drugListProvider.notifier)
+                          .initialize('', locale);
+                    } else {
+                      ref.invalidate(
+                        storeProvider((query: query, locale: locale)),
+                      );
+                    }
+                  });
                 },
               ),
 
@@ -143,24 +165,44 @@ class _MainScreen extends ConsumerState<MainScreen> {
 
             _debounce = Timer(const Duration(milliseconds: 500), () {
               ref.read(searchQueryProvider.notifier).updateQuery(value);
-              ref.read(drugListProvider.notifier).initialize(value, locale);
+
+              if (connectionState.value == InternetStatus.connected) {
+                ref.read(drugListProvider.notifier).initialize(value, locale);
+              } else {
+                ref.invalidate(storeProvider((query: query, locale: locale)));
+              }
             });
           },
         ),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          ref.read(drugListProvider.notifier).initialize(query, locale);
+          final status = connectionState.value;
+          if (status == InternetStatus.connected) {
+            ref.read(drugListProvider.notifier).initialize(query, locale);
+          } else {
+            ref.invalidate(storeProvider((query: query, locale: locale)));
+          }
         },
-        child: drugState.error != null
-            ? Center(child: Text(drugState.error!))
-            : ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: drugState.drugs.length + 1,
-                itemBuilder: (context, index) {
-                  // show drug items
-                  if (index < drugState.drugs.length) {
-                    final drug = drugState.drugs[index];
+        child: connectionState.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text("$err: $stack")),
+          data: (state) {
+            if (state == InternetStatus.connected) {
+              return DrugPaginatedList(
+                drugState: drugState,
+                query: query,
+                locale: locale,
+              );
+            }
+
+            return storeAsync.when(
+              data: (list) {
+                debugPrint(list.length.toString());
+                return ListView.builder(
+                  itemCount: list.length,
+                  itemBuilder: (context, index) {
+                    final drug = list[index];
                     return ListTile(
                       title: Text(drug.name),
                       subtitle: Text(drug.genericName),
@@ -171,35 +213,14 @@ class _MainScreen extends ConsumerState<MainScreen> {
                         ),
                       ),
                     );
-                  }
-
-                  if (drugState.loading) {
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(16),
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
-
-                  if (drugState.hasMore) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                          onPressed: () =>
-                              ref.read(drugListProvider.notifier).loadMore(),
-                          child: Text(
-                            AppLocalizations.of(context)!.button_load_more,
-                          ),
-                        ),
-                      ),
-                    );
-                  }
-
-                  return const SizedBox.shrink();
-                },
-              ),
+                  },
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) => Center(child: Text("$err: $stack")),
+            );
+          },
+        ),
       ),
     );
   }

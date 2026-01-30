@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tanglaw/core/repository/drugs.dart';
 import 'package:tanglaw/core/network/api_client.dart';
@@ -74,7 +73,6 @@ class DrugListNotifier extends Notifier<DrugListState> {
         currentPage: 1,
       );
     } catch (e) {
-      debugPrint(e.toString());
       state = state.copyWith(loading: false, error: e.toString());
     }
   }

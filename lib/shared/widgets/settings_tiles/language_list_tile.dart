@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tanglaw/features/main/provider_drugs.dart';
 import 'package:tanglaw/features/settings/provider_locale.dart';
 import 'package:tanglaw/l10n/app_localizations.dart';
 
@@ -18,6 +19,7 @@ class LanguageListTile extends ConsumerWidget {
     return SimpleDialogOption(
       onPressed: () {
         ref.read(localeProvider.notifier).setLocale(code);
+        ref.read(drugListProvider.notifier).initialize('', code);
         Navigator.pop(context); // Close dialog
       },
       child: Padding(

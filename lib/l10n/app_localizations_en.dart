@@ -21,6 +21,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get button_load_more => 'Load more';
 
   @override
+  String get button_refresh => 'Refresh';
+
+  @override
   String get placeholder_search => 'Search';
 
   @override
@@ -42,8 +45,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pref_language_option_fil => 'Filipino';
 
   @override
+  String get pref_setup_offline_use => 'Setup for Offline Use';
+
+  @override
+  String get pref_setup_offline_use_desc =>
+      'Save drug data for offline use, even in low-signal areas';
+
+  @override
+  String get pref_setup_offline_use_loading =>
+      'Downloading Medical Database...';
+
+  @override
+  String get pref_setup_offline_use_error => 'Download failed, try again later';
+
+  @override
+  String get pref_sync_with_server => 'Update Medical Database';
+
+  @override
+  String get pref_sync_with_server_desc =>
+      'Refresh your local library with the latest pharmaceutical data, dosage updates, and safety advisories from the server.';
+
+  @override
   String get status_no_internet => 'No Connection';
 
   @override
   String get status_has_internet => 'Connection Established';
+
+  @override
+  String get error_generic => 'An Error Occurred';
 }

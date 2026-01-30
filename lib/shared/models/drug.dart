@@ -16,6 +16,17 @@ class Drug extends StrapiObject {
     required this.content,
   });
 
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'documentId': documentId,
+    'createdAt': createdAt.toIso8601String(),
+    'updatedAt': updatedAt.toIso8601String(),
+    'publishedAt': publishedAt.toIso8601String(),
+    'name': name,
+    'genericName': genericName,
+    'content': content,
+  };
+
   factory Drug.fromJson(Map<String, dynamic> json) {
     return switch (json) {
       {

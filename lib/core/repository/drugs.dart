@@ -27,6 +27,7 @@ class DrugsRepository {
     String? locale,
     int? page = 1,
     int? pageSize = 25,
+    String? updatedAt,
   }) async {
     final uri = Uri(
       path: '/drugs',
@@ -35,7 +36,8 @@ class DrugsRepository {
           'filters[name][\$contains]': query,
         if (locale != null && locale.isNotEmpty) 'locale': locale,
         if (page != null) 'pagination[page]': page.toString(),
-        if (page != null) 'pagination[pageSize]': pageSize.toString(),
+        if (pageSize != null) 'pagination[pageSize]': pageSize.toString(),
+        if (updatedAt != null) 'filters[updatedAt][\$gt]': updatedAt,
       },
     );
     final endpoint = uri.toString();
