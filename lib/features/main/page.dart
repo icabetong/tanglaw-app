@@ -5,13 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:tanglaw/core/providers/connectivity.dart';
 import 'package:tanglaw/features/about/page.dart';
-import 'package:tanglaw/features/detail/page.dart';
 import 'package:tanglaw/features/main/provider_drugs.dart';
 import 'package:tanglaw/features/main/provider_store.dart';
 import 'package:tanglaw/features/main/provider_search.dart';
 import 'package:tanglaw/features/settings/page.dart';
 import 'package:tanglaw/features/settings/provider_locale.dart';
 import 'package:tanglaw/l10n/app_localizations.dart';
+import 'package:tanglaw/shared/widgets/drug_list_tile.dart';
 import 'package:tanglaw/shared/widgets/paginated_list.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
@@ -203,16 +203,7 @@ class _MainScreen extends ConsumerState<MainScreen> {
                   itemCount: list.length,
                   itemBuilder: (context, index) {
                     final drug = list[index];
-                    return ListTile(
-                      title: Text(drug.name),
-                      subtitle: Text(drug.genericName),
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DetailScreen(drug: drug),
-                        ),
-                      ),
-                    );
+                    return DrugListTile(drug: drug);
                   },
                 );
               },

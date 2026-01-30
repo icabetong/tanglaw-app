@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tanglaw/features/detail/page.dart';
 import 'package:tanglaw/features/main/provider_drugs.dart';
-
 import 'package:tanglaw/l10n/app_localizations.dart';
+import 'package:tanglaw/shared/widgets/drug_list_tile.dart';
 
 class DrugPaginatedList extends ConsumerWidget {
   final DrugListState drugState;
@@ -20,7 +19,6 @@ class DrugPaginatedList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (drugState.error != null) {
-      debugPrint(drugState.error);
       return Center(
         child: Column(
           mainAxisAlignment: .center,
@@ -44,14 +42,7 @@ class DrugPaginatedList extends ConsumerWidget {
         // show drug items
         if (index < drugState.drugs.length) {
           final drug = drugState.drugs[index];
-          return ListTile(
-            title: Text(drug.name),
-            subtitle: Text(drug.genericName),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => DetailScreen(drug: drug)),
-            ),
-          );
+          return DrugListTile(drug: drug);
         }
 
         if (drugState.loading) {
