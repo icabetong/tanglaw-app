@@ -13,10 +13,20 @@ final storeProvider =
       final store = DrugDataStoreLocalized.getLocalizedStore(params.locale);
 
       final finder = Finder(
-        filter: Filter.custom((record) {
-          final name = (record['name'] as String).toLowerCase();
-          return name.contains(params.query.toLowerCase());
-        }),
+        filter: Filter.or([
+          Filter.custom((record) {
+            final name = (record['name'] as String).toLowerCase();
+            return name.contains(params.query.toLowerCase());
+          }),
+          Filter.custom((record) {
+            final name = (record['genericName'] as String).toLowerCase();
+            return name.contains(params.query.toLowerCase());
+          }),
+          Filter.custom((record) {
+            final name = (record['brandNames'] as String).toLowerCase();
+            return name.contains(params.query.toLowerCase());
+          }),
+        ]),
         sortOrders: [SortOrder('name')],
       );
 

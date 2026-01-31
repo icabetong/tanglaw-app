@@ -11,7 +11,7 @@ class DrugListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(drug.name),
-      subtitle: Text(drug.genericName),
+      subtitle: Text(drug.brandNames),
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => DetailScreen(drug: drug)),

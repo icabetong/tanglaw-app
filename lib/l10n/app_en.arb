@@ -10,8 +10,10 @@
   "menu_about": "About",
   "pref_language": "Language",
   "pref_language_option_en": "English",
-  "pref_language_option_fil": "Filipino",
-  "pref_setup_offline_use": "Setup for Offline Use",
+  "pref_language_option_fil": "Tagalog",
+  "pref_language_option_ilo": "Ilocano",
+  "pref_language_option_ceb": "Cebuano/Bisaya",
+  "pref_setup_offline_use": "Download Content",
   "pref_setup_offline_use_desc": "Save drug data for offline use, even in low-signal areas",
   "pref_setup_offline_use_loading": "Downloading Medical Database...",
   "pref_setup_offline_use_error": "Download failed, try again later",
@@ -19,5 +21,27 @@
   "pref_sync_with_server_desc": "Refresh your local library with the latest pharmaceutical data, dosage updates, and safety advisories from the server.",
   "status_no_internet": "No Connection",
   "status_has_internet": "Connection Established",
+  "status_no_drugs": "No Data Available",
+  "status_no_results": "There's no results for the query",
+  "status_last_sync_date": "Last download: {date}",
+  "@status_last_sync_date": {
+    "description": "",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "MMMM d yyyy HH:mm AA"
+      }
+    }
+  },
+  "status_n_available": "{count} total items",
+  "@status_n_available": {
+    "description": "A general-purpose description field used for providing additional information or context about an item, feature, or entity within the application. This field accepts plain text and can be left empty if no description is needed.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
   "error_generic": "An Error Occurred"
 }

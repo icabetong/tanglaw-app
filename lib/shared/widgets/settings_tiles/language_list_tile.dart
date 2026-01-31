@@ -65,6 +65,20 @@ class LanguageListTile extends ConsumerWidget {
             'fil',
             currentLocale,
           ),
+          _languageOption(
+            context,
+            ref,
+            AppLocalizations.of(context)!.pref_language_option_ilo,
+            'ig', // there's no Ilocano in Strapi so we'll substitute it instead
+            currentLocale,
+          ),
+          _languageOption(
+            context,
+            ref,
+            AppLocalizations.of(context)!.pref_language_option_ceb,
+            'bs', // there's no Cebuano/Bisaya in Strapi so we'll substitute it instead
+            currentLocale,
+          ),
         ],
       ),
     );
@@ -76,6 +90,10 @@ class LanguageListTile extends ConsumerWidget {
         return AppLocalizations.of(context)!.pref_language_option_en;
       case 'fil':
         return AppLocalizations.of(context)!.pref_language_option_fil;
+      case 'ig':
+        return AppLocalizations.of(context)!.pref_language_option_ilo;
+      case "bs":
+        return AppLocalizations.of(context)!.pref_language_option_ceb;
       default:
         return code;
     }

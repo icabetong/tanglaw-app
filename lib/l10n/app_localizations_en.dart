@@ -42,10 +42,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pref_language_option_en => 'English';
 
   @override
-  String get pref_language_option_fil => 'Filipino';
+  String get pref_language_option_fil => 'Tagalog';
 
   @override
-  String get pref_setup_offline_use => 'Setup for Offline Use';
+  String get pref_language_option_ilo => 'Ilocano';
+
+  @override
+  String get pref_language_option_ceb => 'Cebuano/Bisaya';
+
+  @override
+  String get pref_setup_offline_use => 'Download Content';
 
   @override
   String get pref_setup_offline_use_desc =>
@@ -70,6 +76,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get status_has_internet => 'Connection Established';
+
+  @override
+  String get status_no_drugs => 'No Data Available';
+
+  @override
+  String get status_no_results => 'There\'s no results for the query';
+
+  @override
+  String status_last_sync_date(String date) {
+    return 'Last download: $date';
+  }
+
+  @override
+  String status_n_available(int count) {
+    return '$count total items';
+  }
 
   @override
   String get error_generic => 'An Error Occurred';

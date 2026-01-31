@@ -12,6 +12,7 @@ import 'package:tanglaw/features/settings/page.dart';
 import 'package:tanglaw/features/settings/provider_locale.dart';
 import 'package:tanglaw/l10n/app_localizations.dart';
 import 'package:tanglaw/shared/widgets/drug_list_tile.dart';
+import 'package:tanglaw/shared/widgets/empty_view.dart';
 import 'package:tanglaw/shared/widgets/paginated_list.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
@@ -198,7 +199,14 @@ class _MainScreen extends ConsumerState<MainScreen> {
 
             return storeAsync.when(
               data: (list) {
-                debugPrint(list.length.toString());
+                if (list.isEmpty) {
+                  return EmptyViewWidget(
+                    title: query.isNotEmpty
+                        ? AppLocalizations.of(context)!.status_no_results
+                        : AppLocalizations.of(context)!.status_no_drugs,
+                  );
+                }
+
                 return ListView.builder(
                   itemCount: list.length,
                   itemBuilder: (context, index) {

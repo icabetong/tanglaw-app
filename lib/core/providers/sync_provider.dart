@@ -3,11 +3,16 @@ import 'package:sembast/sembast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tanglaw/core/network/api_client.dart';
 import 'package:tanglaw/core/providers/database.dart';
+import 'package:tanglaw/core/providers/last_sync_provider.dart';
 import 'package:tanglaw/core/repository/drugs.dart';
 import 'package:tanglaw/core/store/drugs.dart';
 import 'package:tanglaw/shared/models/drug.dart';
 
 class DataSyncNotifier extends AsyncNotifier<void> {
+  late final String locale;
+
+  DataSyncNotifier({required this.locale});
+
   @override
   Future<void> build() async {
     // Initial state is 'null' (idle).
@@ -25,7 +30,7 @@ class DataSyncNotifier extends AsyncNotifier<void> {
       final store = DrugDataStoreLocalized.getLocalizedStore(locale);
       final database = await ref.read(databaseProvider.future);
 
-      final String? lastSync = prefs.getString('last_data_sync');
+      final String? lastSync = prefs.getString('last_data_sync_$locale');
 
       int currentPage = 1;
       int pageCount = 1;
@@ -51,11 +56,17 @@ class DataSyncNotifier extends AsyncNotifier<void> {
         });
       }
 
-      await prefs.setString('last_data_sync', DateTime.now().toIso8601String());
+      await prefs.setString(
+        'last_data_sync_$locale',
+        DateTime.now().toIso8601String(),
+      );
+
+      ref.invalidate(lastSyncProvider(locale ?? 'en'));
     });
   }
 }
 
-final syncProvider = AsyncNotifierProvider<DataSyncNotifier, void>(() {
-  return DataSyncNotifier();
-});
+final syncProvider =
+    AsyncNotifierProvider.family<DataSyncNotifier, void, String>((locale) {
+      return DataSyncNotifier(locale: locale);
+    });

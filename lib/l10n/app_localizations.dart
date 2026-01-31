@@ -163,13 +163,25 @@ abstract class AppLocalizations {
   /// No description provided for @pref_language_option_fil.
   ///
   /// In en, this message translates to:
-  /// **'Filipino'**
+  /// **'Tagalog'**
   String get pref_language_option_fil;
+
+  /// No description provided for @pref_language_option_ilo.
+  ///
+  /// In en, this message translates to:
+  /// **'Ilocano'**
+  String get pref_language_option_ilo;
+
+  /// No description provided for @pref_language_option_ceb.
+  ///
+  /// In en, this message translates to:
+  /// **'Cebuano/Bisaya'**
+  String get pref_language_option_ceb;
 
   /// No description provided for @pref_setup_offline_use.
   ///
   /// In en, this message translates to:
-  /// **'Setup for Offline Use'**
+  /// **'Download Content'**
   String get pref_setup_offline_use;
 
   /// No description provided for @pref_setup_offline_use_desc.
@@ -213,6 +225,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Connection Established'**
   String get status_has_internet;
+
+  /// No description provided for @status_no_drugs.
+  ///
+  /// In en, this message translates to:
+  /// **'No Data Available'**
+  String get status_no_drugs;
+
+  /// No description provided for @status_no_results.
+  ///
+  /// In en, this message translates to:
+  /// **'There\'s no results for the query'**
+  String get status_no_results;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Last download: {date}'**
+  String status_last_sync_date(String date);
+
+  /// A general-purpose description field used for providing additional information or context about an item, feature, or entity within the application. This field accepts plain text and can be left empty if no description is needed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} total items'**
+  String status_n_available(int count);
 
   /// No description provided for @error_generic.
   ///

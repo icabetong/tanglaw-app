@@ -30,6 +30,14 @@ class SettingsScreen extends StatelessWidget {
             title: AppLocalizations.of(context)!.pref_language_option_fil,
             locale: 'fil',
           ),
+          DownloadContentListTile(
+            title: AppLocalizations.of(context)!.pref_language_option_ilo,
+            locale: 'ig',
+          ),
+          DownloadContentListTile(
+            title: AppLocalizations.of(context)!.pref_language_option_ceb,
+            locale: 'bs',
+          ),
         ],
       ),
     );

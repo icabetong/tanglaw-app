@@ -3,17 +3,20 @@ import 'package:tanglaw/shared/models/strapi_object.dart';
 class Drug extends StrapiObject {
   final String name;
   final String genericName;
+  final String brandNames;
   final String content;
 
   const Drug({
+    required this.name,
+    required this.genericName,
+    required this.brandNames,
+    required this.content,
+    // inherited properties
     required super.id,
     required super.documentId,
     required super.createdAt,
     required super.updatedAt,
     required super.publishedAt,
-    required this.name,
-    required this.genericName,
-    required this.content,
   });
 
   Map<String, dynamic> toJson() => {
@@ -24,6 +27,7 @@ class Drug extends StrapiObject {
     'publishedAt': publishedAt.toIso8601String(),
     'name': name,
     'genericName': genericName,
+    'brandNames': brandNames,
     'content': content,
   };
 
@@ -37,11 +41,13 @@ class Drug extends StrapiObject {
         'publishedAt': String publishedAt,
         'name': String name,
         'genericName': String genericName,
+        'brandNames': String brandNames,
         'content': String content,
       } =>
         Drug(
           name: name,
           genericName: genericName,
+          brandNames: brandNames,
           content: content,
           id: id,
           documentId: documentId,

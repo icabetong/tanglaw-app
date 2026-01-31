@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tanglaw/features/main/provider_drugs.dart';
 import 'package:tanglaw/l10n/app_localizations.dart';
 import 'package:tanglaw/shared/widgets/drug_list_tile.dart';
+import 'package:tanglaw/shared/widgets/empty_view.dart';
 
 class DrugPaginatedList extends ConsumerWidget {
   final DrugListState drugState;
@@ -32,6 +33,14 @@ class DrugPaginatedList extends ConsumerWidget {
             ),
           ],
         ),
+      );
+    }
+
+    if (drugState.drugs.isEmpty && drugState.currentPage == 1) {
+      return EmptyViewWidget(
+        title: query.isNotEmpty
+            ? AppLocalizations.of(context)!.status_no_results
+            : AppLocalizations.of(context)!.status_no_drugs,
       );
     }
 
