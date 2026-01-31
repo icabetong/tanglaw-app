@@ -20,32 +20,36 @@ class DrugPaginatedList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (drugState.error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: .center,
-          crossAxisAlignment: .center,
-          children: [
-            Text(AppLocalizations.of(context)!.error_generic),
-            TextButton(
-              onPressed: () =>
-                  ref.read(drugListProvider.notifier).initialize(query, locale),
-              child: Text(AppLocalizations.of(context)!.button_refresh),
-            ),
-          ],
+      return SliverToBoxAdapter(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: .center,
+            crossAxisAlignment: .center,
+            children: [
+              Text(AppLocalizations.of(context)!.error_generic),
+              TextButton(
+                onPressed: () => ref
+                    .read(drugListProvider.notifier)
+                    .initialize(query, locale),
+                child: Text(AppLocalizations.of(context)!.button_refresh),
+              ),
+            ],
+          ),
         ),
       );
     }
 
     if (drugState.drugs.isEmpty && drugState.currentPage == 1) {
-      return EmptyViewWidget(
-        title: query.isNotEmpty
-            ? AppLocalizations.of(context)!.status_no_results
-            : AppLocalizations.of(context)!.status_no_drugs,
+      return SliverToBoxAdapter(
+        child: EmptyViewWidget(
+          title: query.isNotEmpty
+              ? AppLocalizations.of(context)!.status_no_results
+              : AppLocalizations.of(context)!.status_no_drugs,
+        ),
       );
     }
 
-    return ListView.builder(
-      physics: const AlwaysScrollableScrollPhysics(),
+    return SliverList.builder(
       itemCount: drugState.drugs.length + 1,
       itemBuilder: (context, index) {
         // show drug items

@@ -11,7 +11,6 @@ import 'package:tanglaw/features/main/provider_search.dart';
 import 'package:tanglaw/features/settings/page.dart';
 import 'package:tanglaw/features/settings/provider_locale.dart';
 import 'package:tanglaw/l10n/app_localizations.dart';
-import 'package:tanglaw/shared/widgets/drug_list_tile.dart';
 import 'package:tanglaw/shared/widgets/empty_view.dart';
 import 'package:tanglaw/shared/widgets/paginated_list.dart';
 
@@ -63,13 +62,76 @@ class _MainScreen extends ConsumerState<MainScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _renderSearchBar(
+    String locale,
+    String query,
+    InternetStatus? connectionState,
+  ) {
     final Map<String, String> menuItems = {
       'settings': AppLocalizations.of(context)!.menu_settings,
       'about': AppLocalizations.of(context)!.menu_about,
     };
 
+    return SearchBar(
+      controller: _controller,
+      elevation: WidgetStateProperty.all(0),
+      backgroundColor: WidgetStateProperty.all(
+        Theme.of(context).colorScheme.surfaceContainerHigh,
+      ),
+      constraints: const BoxConstraints(maxHeight: 48, minHeight: 48),
+      hintText: AppLocalizations.of(context)!.placeholder_search,
+      leading: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: const Icon(Icons.search),
+      ),
+      trailing: [
+        if (_controller.text.isNotEmpty)
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () {
+              _controller.clear();
+
+              if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+              _debounce = Timer(const Duration(milliseconds: 500), () {
+                ref.read(searchQueryProvider.notifier).updateQuery('');
+
+                if (connectionState == InternetStatus.connected) {
+                  ref.read(drugListProvider.notifier).initialize('', locale);
+                } else {
+                  ref.invalidate(storeProvider((query: query, locale: locale)));
+                }
+              });
+            },
+          ),
+
+        PopupMenuButton<String>(
+          itemBuilder: (context) {
+            return menuItems.entries.map((entry) {
+              return PopupMenuItem(value: entry.key, child: Text(entry.value));
+            }).toList();
+          },
+          onSelected: onMenuItemSelected,
+        ),
+      ],
+      onChanged: (value) {
+        if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+        _debounce = Timer(const Duration(milliseconds: 500), () {
+          ref.read(searchQueryProvider.notifier).updateQuery(value);
+
+          if (connectionState == InternetStatus.connected) {
+            ref.read(drugListProvider.notifier).initialize(value, locale);
+          } else {
+            ref.invalidate(storeProvider((query: query, locale: locale)));
+          }
+        });
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final connectionState = ref.watch(internetStatusProvider);
     final drugState = ref.watch(drugListProvider);
     final query = ref.watch(searchQueryProvider);
@@ -88,7 +150,7 @@ class _MainScreen extends ConsumerState<MainScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(AppLocalizations.of(context)!.status_no_internet),
-              backgroundColor: Colors.red,
+              backgroundColor: Theme.of(context).colorScheme.error,
               duration: Duration(days: 1),
               showCloseIcon: false,
             ),
@@ -109,117 +171,137 @@ class _MainScreen extends ConsumerState<MainScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 72,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        title: SearchBar(
-          controller: _controller,
-          elevation: WidgetStateProperty.all(0),
-          backgroundColor: WidgetStateProperty.all(
-            Theme.of(context).colorScheme.surfaceContainerHigh,
-          ),
-          constraints: const BoxConstraints(maxHeight: 48, minHeight: 48),
-          hintText: AppLocalizations.of(context)!.placeholder_search,
-          leading: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: const Icon(Icons.search),
-          ),
-          trailing: [
-            if (_controller.text.isNotEmpty)
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  _controller.clear();
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: CustomScrollView(
+        slivers: [
+          SliverLayoutBuilder(
+            builder: (context, constraints) {
+              final isCollapsed =
+                  constraints.scrollOffset > (180 - kToolbarHeight);
 
-                  if (_debounce?.isActive ?? false) _debounce!.cancel();
+              return SliverAppBar(
+                pinned: true,
+                expandedHeight: 180,
+                backgroundColor: Theme.of(context).colorScheme.primaryFixedDim,
+                elevation: 0,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(16),
+                  ),
+                ),
 
-                  _debounce = Timer(const Duration(milliseconds: 500), () {
-                    ref.read(searchQueryProvider.notifier).updateQuery('');
+                bottom: PreferredSize(
+                  preferredSize: Size.fromHeight(isCollapsed ? 56 : 0),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    child: isCollapsed
+                        ? Padding(
+                            key: const ValueKey('collapsed'),
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                            child: SizedBox(
+                              height: 56,
+                              child: _renderSearchBar(
+                                locale,
+                                query,
+                                connectionState.value,
+                              ),
+                            ),
+                          )
+                        : const SizedBox(key: ValueKey('empty'), height: 0),
+                  ),
+                ),
 
-                    if (connectionState.value == InternetStatus.connected) {
-                      ref
-                          .read(drugListProvider.notifier)
-                          .initialize('', locale);
-                    } else {
-                      ref.invalidate(
-                        storeProvider((query: query, locale: locale)),
-                      );
-                    }
-                  });
-                },
-              ),
+                flexibleSpace: FlexibleSpaceBar(
+                  background: SafeArea(
+                    bottom: false,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 40, 8, 0),
+                      child: Column(
+                        crossAxisAlignment: .start,
+                        children: [
+                          AnimatedOpacity(
+                            opacity: isCollapsed ? 0 : 1,
+                            duration: const Duration(milliseconds: 200),
+                            child: Text(
+                              AppLocalizations.of(context)!.app_name,
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
 
-            PopupMenuButton<String>(
-              itemBuilder: (context) {
-                return menuItems.entries.map((entry) {
-                  return PopupMenuItem(
-                    value: entry.key,
-                    child: Text(entry.value),
-                  );
-                }).toList();
-              },
-              onSelected: onMenuItemSelected,
-            ),
-          ],
-          onChanged: (value) {
-            if (_debounce?.isActive ?? false) _debounce!.cancel();
-
-            _debounce = Timer(const Duration(milliseconds: 500), () {
-              ref.read(searchQueryProvider.notifier).updateQuery(value);
-
-              if (connectionState.value == InternetStatus.connected) {
-                ref.read(drugListProvider.notifier).initialize(value, locale);
-              } else {
-                ref.invalidate(storeProvider((query: query, locale: locale)));
-              }
-            });
-          },
-        ),
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          final status = connectionState.value;
-          if (status == InternetStatus.connected) {
-            ref.read(drugListProvider.notifier).initialize(query, locale);
-          } else {
-            ref.invalidate(storeProvider((query: query, locale: locale)));
-          }
-        },
-        child: connectionState.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, stack) => Center(child: Text("$err: $stack")),
-          data: (state) {
-            if (state == InternetStatus.connected) {
-              return DrugPaginatedList(
-                drugState: drugState,
-                query: query,
-                locale: locale,
+                          SizedBox(
+                            height: 56,
+                            child: AnimatedOpacity(
+                              opacity: isCollapsed ? 0 : 1,
+                              duration: const Duration(milliseconds: 200),
+                              child: _renderSearchBar(
+                                locale,
+                                query,
+                                connectionState.value,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               );
-            }
+            },
+          ),
 
-            return storeAsync.when(
-              data: (list) {
-                if (list.isEmpty) {
-                  return EmptyViewWidget(
-                    title: query.isNotEmpty
-                        ? AppLocalizations.of(context)!.status_no_results
-                        : AppLocalizations.of(context)!.status_no_drugs,
-                  );
-                }
-
-                return ListView.builder(
-                  itemCount: list.length,
-                  itemBuilder: (context, index) {
-                    final drug = list[index];
-                    return DrugListTile(drug: drug);
-                  },
+          connectionState.when(
+            loading: () => SliverToBoxAdapter(
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (err, stack) => SliverToBoxAdapter(
+              child: Center(
+                child: Text(AppLocalizations.of(context)!.error_generic),
+              ),
+            ),
+            data: (state) {
+              if (state == InternetStatus.connected) {
+                return DrugPaginatedList(
+                  drugState: drugState,
+                  query: query,
+                  locale: locale,
                 );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text("$err: $stack")),
-            );
-          },
-        ),
+              }
+
+              return storeAsync.when(
+                loading: () => SliverToBoxAdapter(
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+                error: (err, stack) => SliverToBoxAdapter(
+                  child: Center(
+                    child: Text(AppLocalizations.of(context)!.error_generic),
+                  ),
+                ),
+                data: (list) {
+                  if (list.isEmpty) {
+                    return SliverToBoxAdapter(
+                      child: EmptyViewWidget(
+                        title: query.isNotEmpty
+                            ? AppLocalizations.of(context)!.status_no_results
+                            : AppLocalizations.of(context)!.status_no_drugs,
+                      ),
+                    );
+                  }
+
+                  return SliverList.builder(
+                    itemCount: list.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(title: Text('Medicine $index'));
+                    },
+                  );
+                },
+              );
+            },
+          ),
+        ],
       ),
     );
   }
