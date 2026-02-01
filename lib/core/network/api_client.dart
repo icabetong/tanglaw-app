@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class ApiClient {
   static ApiClient? _client;
-  final String _endpoint = 'http://10.0.2.2:1337/api';
+  final String _endpoint = kDebugMode
+      ? 'http://10.0.2.2:1337/api'
+      : 'https://artistic-hope-60af4db29a.strapiapp.com/api';
 
   ApiClient._();
 

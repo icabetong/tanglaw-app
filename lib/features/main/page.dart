@@ -217,17 +217,14 @@ class _MainScreen extends ConsumerState<MainScreen> {
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(16, 40, 8, 0),
                       child: Column(
-                        crossAxisAlignment: .start,
+                        crossAxisAlignment: .center,
                         children: [
                           AnimatedOpacity(
                             opacity: isCollapsed ? 0 : 1,
                             duration: const Duration(milliseconds: 200),
-                            child: Text(
-                              AppLocalizations.of(context)!.app_name,
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            child: Image(
+                              height: 56,
+                              image: AssetImage('assets/logo-white.png'),
                             ),
                           ),
                           const SizedBox(height: 16),

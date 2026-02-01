@@ -35,3 +35,8 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+
+  assets:
+   - assets/logo-gradient.png
+   - assets/logo-orange.png
+   - assets/logo-white.png
