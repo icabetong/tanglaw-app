@@ -37,6 +37,4 @@ flutter:
   generate: true
 
   assets:
-   - assets/logo-gradient.png
-   - assets/logo-orange.png
    - assets/logo-white.png
