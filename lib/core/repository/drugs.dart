@@ -32,8 +32,12 @@ class DrugsRepository {
     final uri = Uri(
       path: '/drugs',
       queryParameters: {
+        'sort[0]': 'name',
+        'sort[1]': 'genericName',
+        'sort[2]': 'createdAt',
+
         if (query != null && query.isNotEmpty)
-          'filters[name][\$contains]': query,
+          'filters[name][\$containsi]': query,
         if (locale != null && locale.isNotEmpty) 'locale': locale,
         if (page != null) 'pagination[page]': page.toString(),
         if (pageSize != null) 'pagination[pageSize]': pageSize.toString(),
