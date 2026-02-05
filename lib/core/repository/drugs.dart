@@ -36,8 +36,10 @@ class DrugsRepository {
         'sort[1]': 'genericName',
         'sort[2]': 'createdAt',
 
-        if (query != null && query.isNotEmpty)
-          'filters[name][\$containsi]': query,
+        if (query != null && query.isNotEmpty) ...{
+          'filters[\$or][0][name][\$containsi]': query,
+          'filters[\$or][1][brandNames][\$containsi]': query,
+        },
         if (locale != null && locale.isNotEmpty) 'locale': locale,
         if (page != null) 'pagination[page]': page.toString(),
         if (pageSize != null) 'pagination[pageSize]': pageSize.toString(),
