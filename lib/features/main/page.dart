@@ -16,9 +16,7 @@ import 'package:tanglaw/shared/widgets/empty_view.dart';
 import 'package:tanglaw/shared/widgets/paginated_list.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
-  const MainScreen({super.key, required this.title});
-
-  final String title;
+  const MainScreen({super.key});
 
   @override
   ConsumerState<MainScreen> createState() => _MainScreen();
@@ -57,7 +55,9 @@ class _MainScreen extends ConsumerState<MainScreen> {
       case 'about':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const AboutScreen()),
+          MaterialPageRoute(
+            builder: (context) => const AboutScreen(isWelcome: false),
+          ),
         );
         break;
     }

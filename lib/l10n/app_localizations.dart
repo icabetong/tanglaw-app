@@ -124,11 +124,23 @@ abstract class AppLocalizations {
   /// **'Refresh'**
   String get button_refresh;
 
+  /// No description provided for @button_continue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get button_continue;
+
   /// No description provided for @placeholder_search.
   ///
   /// In en, this message translates to:
   /// **'Search'**
   String get placeholder_search;
+
+  /// No description provided for @placeholder_brands.
+  ///
+  /// In en, this message translates to:
+  /// **'Brands'**
+  String get placeholder_brands;
 
   /// No description provided for @loading_languages.
   ///

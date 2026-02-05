@@ -24,7 +24,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get button_refresh => 'Refresh';
 
   @override
+  String get button_continue => 'Continue';
+
+  @override
   String get placeholder_search => 'Search';
+
+  @override
+  String get placeholder_brands => 'Brands';
 
   @override
   String get loading_languages => 'Loading languages...';

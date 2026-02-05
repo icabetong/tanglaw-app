@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_md/flutter_md.dart';
+import 'package:tanglaw/l10n/app_localizations.dart';
 import 'package:tanglaw/shared/models/drug.dart';
 import 'package:tanglaw/shared/models/markdown_section.dart';
 
@@ -30,7 +31,7 @@ class _DetailScreenState extends State<DetailScreen> {
           children: [
             ExpansionTile(
               shape: Border(),
-              title: Text('Brand Names'),
+              title: Text(AppLocalizations.of(context)!.placeholder_brands),
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(
