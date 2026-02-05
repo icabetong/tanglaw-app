@@ -11,6 +11,7 @@ import 'package:tanglaw/features/main/provider_search.dart';
 import 'package:tanglaw/features/settings/page.dart';
 import 'package:tanglaw/features/settings/provider_locale.dart';
 import 'package:tanglaw/l10n/app_localizations.dart';
+import 'package:tanglaw/shared/const/branding.dart';
 import 'package:tanglaw/shared/widgets/empty_view.dart';
 import 'package:tanglaw/shared/widgets/paginated_list.dart';
 
@@ -75,9 +76,7 @@ class _MainScreen extends ConsumerState<MainScreen> {
     return SearchBar(
       controller: _controller,
       elevation: WidgetStateProperty.all(0),
-      backgroundColor: WidgetStateProperty.all(
-        Theme.of(context).colorScheme.surfaceContainerHigh,
-      ),
+      backgroundColor: WidgetStateProperty.all(BrandColors.primaryColorSurface),
       constraints: const BoxConstraints(maxHeight: 48, minHeight: 48),
       hintText: AppLocalizations.of(context)!.placeholder_search,
       leading: Padding(
@@ -182,7 +181,7 @@ class _MainScreen extends ConsumerState<MainScreen> {
               return SliverAppBar(
                 pinned: true,
                 expandedHeight: 180,
-                backgroundColor: Theme.of(context).colorScheme.primaryFixedDim,
+                backgroundColor: BrandColors.primaryColor,
                 elevation: 0,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(
