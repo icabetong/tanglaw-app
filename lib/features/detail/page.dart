@@ -31,7 +31,15 @@ class _DetailScreenState extends State<DetailScreen> {
             ExpansionTile(
               shape: Border(),
               title: Text('Brand Names'),
-              children: [Text(widget.drug.brandNames)],
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: Text(widget.drug.brandNames),
+                ),
+              ],
             ),
             ListView.builder(
               physics: NeverScrollableScrollPhysics(),
