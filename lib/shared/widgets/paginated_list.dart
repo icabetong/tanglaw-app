@@ -19,8 +19,14 @@ class DrugPaginatedList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (drugState.loading) {
+      return SliverFillRemaining(
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     if (drugState.error != null) {
-      return SliverToBoxAdapter(
+      return SliverFillRemaining(
         child: Center(
           child: Column(
             mainAxisAlignment: .center,
@@ -40,7 +46,7 @@ class DrugPaginatedList extends ConsumerWidget {
     }
 
     if (drugState.drugs.isEmpty && drugState.currentPage == 1) {
-      return SliverToBoxAdapter(
+      return SliverFillRemaining(
         child: EmptyViewWidget(
           title: query.isNotEmpty
               ? AppLocalizations.of(context)!.status_no_results

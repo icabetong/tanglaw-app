@@ -250,10 +250,10 @@ class _MainScreen extends ConsumerState<MainScreen> {
           ),
 
           connectionState.when(
-            loading: () => SliverToBoxAdapter(
+            loading: () => SliverFillRemaining(
               child: Center(child: CircularProgressIndicator()),
             ),
-            error: (err, stack) => SliverToBoxAdapter(
+            error: (err, stack) => SliverFillRemaining(
               child: Center(
                 child: Text(AppLocalizations.of(context)!.error_generic),
               ),
@@ -268,17 +268,17 @@ class _MainScreen extends ConsumerState<MainScreen> {
               }
 
               return storeAsync.when(
-                loading: () => SliverToBoxAdapter(
+                loading: () => SliverFillRemaining(
                   child: Center(child: CircularProgressIndicator()),
                 ),
-                error: (err, stack) => SliverToBoxAdapter(
+                error: (err, stack) => SliverFillRemaining(
                   child: Center(
                     child: Text(AppLocalizations.of(context)!.error_generic),
                   ),
                 ),
                 data: (list) {
                   if (list.isEmpty) {
-                    return SliverToBoxAdapter(
+                    return SliverFillRemaining(
                       child: EmptyViewWidget(
                         title: query.isNotEmpty
                             ? AppLocalizations.of(context)!.status_no_results
