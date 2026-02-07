@@ -12,6 +12,7 @@ import 'package:tanglaw/features/settings/page.dart';
 import 'package:tanglaw/features/settings/provider_locale.dart';
 import 'package:tanglaw/l10n/app_localizations.dart';
 import 'package:tanglaw/shared/const/branding.dart';
+import 'package:tanglaw/shared/widgets/drug_list_tile.dart';
 import 'package:tanglaw/shared/widgets/empty_view.dart';
 import 'package:tanglaw/shared/widgets/paginated_list.dart';
 
@@ -290,7 +291,8 @@ class _MainScreen extends ConsumerState<MainScreen> {
                   return SliverList.builder(
                     itemCount: list.length,
                     itemBuilder: (context, index) {
-                      return ListTile(title: Text('Medicine $index'));
+                      final drug = list[index];
+                      return DrugListTile(drug: drug);
                     },
                   );
                 },
